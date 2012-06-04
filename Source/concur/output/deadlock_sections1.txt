@@ -1,0 +1,616 @@
+Program Trail Start:
+
+
+  -- numThreads=2, numRounds=1, schedMode=RANDOM, logMode=ON, seed=1338755332
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |false        |                    |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |false        |                    |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |1/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [53] - Selected next thread to run= 1, which is the same as current thread.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |false        |                    |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |false        |                    |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |1/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [55] - Selected next thread to run= 1, which is the same as current thread.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |false        |                    |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |false        |                    |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |1/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [55] - Selected next thread to run= 1, which is the same as current thread.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |false        |                    |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |false        |                    |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |1/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [66] - Switching from thread 1 to thread 0.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Ready        |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |false        |                    |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |false        |                    |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |1/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[0] [53] - Switching from thread 0 to thread 1.
+
+[1] [-1] - mutexLock:  lock is free; thread 1 will now hold lock limitFemale
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |false        |                    |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |1/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [67] - Selected next thread to run= 1, which is the same as current thread.
+
+[1] [-1] - semWait:  semaphore female is available for thread 1's use.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |false        |                    |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [68] - Selected next thread to run= 1, which is the same as current thread.
+
+[1] [-1] - mutexLock:  lock is free; thread 1 will now hold lock femaleMutex
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [69] - Selected next thread to run= 1, which is the same as current thread.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [70] - Switching from thread 1 to thread 0.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Ready        |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[0] [55] - Selected next thread to run= 0, which is the same as current thread.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Ready        |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[0] [55] - Switching from thread 0 to thread 1.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[1] [70] - Switching from thread 1 to thread 0.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Ready        |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |false        |                    |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[0] [56] - Selected next thread to run= 0, which is the same as current thread.
+
+[0] [-1] - mutexLock:  lock is free; thread 0 will now hold lock limitMale
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Ready        |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |1/1          |                                         |
+
+**********************************************************************************
+
+[0] [57] - Selected next thread to run= 0, which is the same as current thread.
+
+[0] [-1] - semWait:  semaphore male is available for thread 0's use.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Ready        |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |false        |                    |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |0/1          |                                         |
+
+**********************************************************************************
+
+[0] [58] - Selected next thread to run= 0, which is the same as current thread.
+
+[0] [-1] - mutexLock:  lock is free; thread 0 will now hold lock maleMutex
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Ready        |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |true         |0                   |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |0/1          |                                         |
+
+**********************************************************************************
+
+[0] [59] - Switching from thread 0 to thread 1.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Running      |                                         |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |true         |0                   |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |0/1          |                                         |
+
+**********************************************************************************
+
+[1] [71] - Selected next thread to run= 1, which is the same as current thread.
+
+[1] [-1] - semWait:  sem male is taken and has value=-1; thread 1 will be added to thread waiting list.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Ready        |                                         |
+|1                        |Waiting_Sem  |male                                     |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |true         |0                   |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |-1/1          |[0]1                                     |
+
+**********************************************************************************
+
+[1] [-1] - Switching from thread 1 to thread 0.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Waiting_Sem  |male                                     |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |true         |0                   |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |-1/1          |[0]1                                     |
+
+**********************************************************************************
+
+[0] [60] - Selected next thread to run= 0, which is the same as current thread.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Waiting_Sem  |male                                     |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |true         |0                   |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |-1/1          |[0]1                                     |
+
+**********************************************************************************
+
+[0] [60] - Selected next thread to run= 0, which is the same as current thread.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Running      |                                         |
+|1                        |Waiting_Sem  |male                                     |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |true         |0                   |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |0/1          |                                         |
+|male                     |-1/1          |[0]1                                     |
+
+**********************************************************************************
+
+[0] [61] - Selected next thread to run= 0, which is the same as current thread.
+
+[0] [-1] - semWait:  sem female is taken and has value=-1; thread 0 will be added to thread waiting list.
+
+**********************************************************************************
+
+THREAD Status: numThreads: 2
+|ID                       |STATUS       |WAITING_NAME                             |
+|0                        |Waiting_Sem  |female                                   |
+|1                        |Waiting_Sem  |male                                     |
+
+__________________________________________________________________________________
+
+LOCK Status: numLock: 4
+|NAME                     |LOCKED       |HOLDING_THREAD      |WAITING_THREADS     |
+|limitMale                |true         |0                   |                    |
+|limitFemale              |true         |1                   |                    |
+|maleMutex                |true         |0                   |                    |
+|femaleMutex              |true         |1                   |                    |
+
+__________________________________________________________________________________
+
+SEMAPHORE Status: numSems: 2
+|NAME                     |VAL/INITIAL  |WAITING_THREADS                          |
+|female                   |-1/1          |[0]0                                     |
+|male                     |-1/1          |[0]1                                     |
+
+**********************************************************************************
+
+[0] [-1] - No ready threads available to schedule; possible DEADLOCK detected.  Exiting.
+
+
+End Program Trail
