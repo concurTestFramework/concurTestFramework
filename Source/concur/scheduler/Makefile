@@ -3,8 +3,8 @@ AR = ar
 CFLAGS = -O0 -g
 ARFLAGS =
 
-OBJS = typeUtils.o sched.o
-HDRS = typeUtils.h sched.h 
+OBJS = utilities.o typeUtils.o logger.o sched.o
+HDRS = utilities.o typeUtils.h logger.h sched.h 
 
 libsched.a: $(OBJS)
 	$(AR)  -r libsched.a $(OBJS)

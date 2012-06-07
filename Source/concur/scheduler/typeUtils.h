@@ -11,11 +11,6 @@ enum SchedulerMode {
   INTERACTIVE
 };
 
-enum LogMode {
-  ON,
-  OFF
-};
-
 struct ThreadNode {
   int id;
   ThreadNode *next;
@@ -63,7 +58,6 @@ struct Semaphore {
 
 std::string getStatus(Status status);
 std::string getModeString(SchedulerMode mode);
-std::string getLogModeString(LogMode mode);
 std::string printThreads(int size, ThreadNode *head);
 ThreadNode *retrieveThreadNode(int size, ThreadNode *head, int position);
 ThreadNode* addThreadNode(int originalSize, ThreadNode *head, int newNode);

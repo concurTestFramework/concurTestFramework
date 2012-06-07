@@ -122,7 +122,7 @@ string getStatus(Status status) {
   return statName;
 }
 
-// Mode
+// Scheduler Mode
 string getModeString(SchedulerMode mode) {
   string modeName;
   switch(mode) {
@@ -137,22 +137,6 @@ string getModeString(SchedulerMode mode) {
                 break;
         case LIFO:
                 modeName = "LIFO";
-                break;
-        default:
-                modeName = "Error";
-        }
-  return modeName;
-}
-
-// Log Mode
-string getLogModeString(LogMode mode) {
-  string modeName;
-  switch(mode) {
-        case ON:
-                modeName = "ON";
-                break;
-        case OFF:
-                modeName = "OFF";
                 break;
         default:
                 modeName = "Error";

@@ -1,8 +1,7 @@
+// sections.4.c (second version of secitons.bad2.c)
+
+
 // sections.c - Synchronization sections for unisex restroom
-
-// sections.1.c
-// sections.good.c
-
 
 #include <stdio.h>
 #include <errno.h>
@@ -11,100 +10,96 @@
 #include "util.h"
 #include "scheduler/sched.h"
 
-
-// Shared variables
-pthread_mutex_t outMutex;
-
 // TODO: Declare shared variables here
-// Creating Mutex variables semaphores, and counters.
-pthread_mutex_t limitMale, limitFemale, maleMutex, femaleMutex;
-sem_t male, female;
-// Counter for males and females.
-int countMale, countFemale = 0;
+pthread_mutex_t numMutex;
+pthread_mutex_t limit_female;
+pthread_mutex_t limit_male;
+sem_t men;
+sem_t women;
+unsigned menCount;
+unsigned womenCount;
 
 
-// Initializing global variables
-void initGlobals()
+void
+initGlobals()
 {
   // LEAVE THIS STATEMENT
-  pthread_mutex_init(&outMutex, NULL);
-
-  // TODO: Complete this function
-  // Initializing Mutex variables and Semaphores
-  pthread_mutex_init(&maleMutex, NULL);
-  pthread_mutex_init(&femaleMutex, NULL);  
-  pthread_mutex_init(&limitMale, NULL);
-  pthread_mutex_init(&limitFemale, NULL);
-  sem_init(&male, 0, 1);
-  sem_init(&female, 0, 1);  
-
-  addLock("limitMale", &limitMale);
-  addLock("limitFemale", &limitFemale);
-  addLock("maleMutex", &maleMutex);
-  addLock("femaleMutex", &femaleMutex);
-  addSemaphore("female", 1, &female);
-  addSemaphore("male", 1, &male);
+  pthread_mutex_init(&numMutex, NULL);
+  pthread_mutex_init(&limit_female, NULL);
+  pthread_mutex_init(&limit_male, NULL);
+  sem_init(&men,0,1);
+  sem_init(&women,0,1);
+  menCount = 0;
+  womenCount = 0;
+  addLock("numMutex", &numMutex);
+  addLock("limit_female", &limit_female);
+  addLock("limit_male", &limit_male);
+  addSemaphore("women", 1, &women);
+  addSemaphore("men", 1, &men);
 }
 
-// Processes the action of males and females
-// when they enter the restroom.
-void entrySection(int id)
+void 
+entrySection(int id)
 {
   bool isFemale = id % 2;
   // TODO: Complete this function
-  if (!isFemale) { // Male
-	mutexLock(id, &limitMale);
-	semWait(id, &male); // other males wait
-	mutexLock(id, &maleMutex); // only current male
-	countMale++; 
-	if (countMale == 1)
-	  semWait(id, &female); // females wait
-	mutexUnlock(id, &maleMutex); // other males
-	semPost(id, &male);
-	mutexUnlock(id, &limitMale);	
-  } else { // Female
-	mutexLock(id, &limitFemale); // Only females
-	semWait(id, &female); // other females wait
-	mutexLock(id, &femaleMutex); // only current female
-	countFemale++; // increment female count
-	if (countFemale == 1)
-	  semWait(id, &male); // males wait if female
-	mutexUnlock(id, &femaleMutex); // other females
-	semPost(id, &female);
-	mutexUnlock(id, &limitFemale);	
+  if(isFemale) {
+    mutexLock(id, &limit_female);
+    semWait(id, &women);
+    mutexLock(id, &numMutex);
+    womenCount++;
+    if(womenCount == 1)
+      semWait(id, &men);
+    mutexUnlock(id, &numMutex);
+    semPost(id, &women);
+    mutexUnlock(id, &limit_female);
   }
+  else {
+    mutexLock(id, &limit_male);
+    semWait(id, &men);
+    mutexLock(id, &numMutex);
+    menCount++;
+    if(menCount == 1)
+      semWait(id, &women);
+    mutexUnlock(id, &numMutex);
+    semPost(id, &men);
+    mutexUnlock(id, &limit_male);
+  }
+  
 }
 
-// Processes male/female action when they leave
-// the restroom.
-void exitSection(int id)
+void 
+exitSection(int id)
 {
   bool isFemale = id % 2;
   // TODO: Complete this function
-  if(!isFemale) { // Male
-	mutexLock(id, &maleMutex); // Male lock
-	countMale--;
-	if (countMale == 0) // No more males
-	  semPost(id, &female); // Females can continue
-	mutexUnlock(id, &maleMutex);
-  } else { // Female
-	mutexLock(id, &femaleMutex); // Female lock
-	countFemale--; 
-	if (countFemale == 0) // No more females
-	  semPost(id, &male); // Males can leave
-	mutexUnlock(id, &femaleMutex);
+  if(isFemale) {
+    mutexLock(id, &limit_female);
+    womenCount--;
+    if(womenCount == 0)
+      semPost(id, &men);
+    mutexUnlock(id, &limit_female);
   }
+  else {
+    mutexLock(id, &limit_male);
+    menCount--;
+    if(menCount == 0)
+      semPost(id, &women);
+    mutexUnlock(id, &limit_male);
+  }
+  
 }
 
-void criticalSection(int id)
+void
+remainderSection(int id)
 {
-  // DO NOT TOUCH THIS FUNCTION
   rand_sleep();
 }
 
-void remainderSection(int id)
+void
+criticalSection(int id)
 {
-  // DO NOT TOUCH THIS FUNCTION
   rand_sleep();
 }
+
 

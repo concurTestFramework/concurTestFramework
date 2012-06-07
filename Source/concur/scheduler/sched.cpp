@@ -3,17 +3,19 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <pthread.h>
-#include <semaphore.h>
 #include <sstream>
 #include <iomanip>
+#include <errno.h> 
+#include <stdio.h>
+#include <unistd.h>
 
-#include <errno.h>                                                         
-#include <signal.h>                                                             
-#include <stdio.h>                                                              
-#include <unistd.h>    
-//#include "types.h"
+#include <pthread.h>
+#include <semaphore.h>
+#include <signal.h>
+    
+#include "logger.h"
 #include "typeUtils.h"
+#include "utilities.h"
 using namespace std;
 
 
@@ -28,11 +30,6 @@ int semCount = 0;
 Thread *threadArray;	// array of threads
 Lock *lockArray;	// array of locks
 Semaphore *semArray;	// array of semaphores
-
-// logging
-LogMode logMode = OFF;
-ofstream outFile;
-char* outFilename;
 
 // for initialization
 bool inInitialization = true;
@@ -67,6 +64,7 @@ extern "C" void addThread(int id, pthread_t &thread);
 extern "C" void addLock(char *name, pthread_mutex_t &lock);
 extern "C" void addSemaphore(char *name, int initial, sem_t &semaphore);
 extern "C" void setThreadCompleted(int threadIndex);
+void initializeSeed(int userSeed);
   // Thread 
 extern "C" void invokeScheduler(int id, int lineNum);
 extern "C" void pauseThread(int id);
@@ -84,23 +82,13 @@ void logStatusToFile();
 string getThreadStatus();
 string getLockStatus();
 string getSemaphoreStatus();
-void writeMessage(const char* msg);
-
-// Helper functions
 int getReadyThreadIndex(SchedulerMode schedMode, int min, int max);
 int getCurrentThreadId();
-string boolToStr(const bool val);
 string getThreadList(int count, Thread* threads);
 Lock* getLock(pthread_mutex_t &lock);
 Semaphore* getSemaphore(sem_t &ptSem);
-string intToStr(int num);
 bool allThreadsCompleted();
-void initializeLogging(char* mode);
-void logToFile(const char* text);
-void endLogging();
-void initializeSeed(int userSeed);
-bool isLogging();
-void stoupper(std::string& s);
+void log(string message);
 
 /******************************************************************************************************
  *                      MUTATOR FUNCTIONS
@@ -118,7 +106,7 @@ extern "C" void initializeScheduler(int numThreads, int numRounds, char* mode, c
   initializeSeed(runSeed);
 
   stringstream ss;
-  ss << "  -- numThreads=" << threadCount << ", numRounds=" << roundsCount << ", schedMode=" << getModeString(schedMode) << ", logMode=" << getLogModeString(logMode).c_str() << ", seed=" << intToStr( (schedMode == RANDOM) ? seed : -1);
+  ss << "  -- numThreads=" << threadCount << ", numRounds=" << roundsCount << ", schedMode=" << getModeString(schedMode) << ", logMode=" << getLogModeString().c_str() << ", seed=" << intToStr( (schedMode == RANDOM) ? seed : -1);
   const char* initMsg = ss.str().c_str();
   printf("%s\n", initMsg);
   logToFile(initMsg);
@@ -148,57 +136,6 @@ void setSchedulerMode(char* mode) {
   
   if (tracing) {
     printf("Setting Scheduler Mode to %s\n", mode);
-  }
-}
-
-/*
-* Set up logging.
-*/
-void initializeLogging(char* level) {
-  stringstream ss;
-  ss << level;
-  string levelStr = ss.str();
-  stoupper(levelStr); // convert to all caps
-  // set logging mode
-  if (strcmp(levelStr.c_str(), "OFF") == 0) {
-    logMode = OFF;
-  } else if ( strcmp(levelStr.c_str(), "ON") == 0 ) {
-    logMode = ON;
-  } else { //this should never happen
-    printf("Error:  received an invalid log mode choice: %d\n", level);
-    exit(EXIT_FAILURE);
-  }
-  
-  if (tracing) {
-    printf("Setting Log Mode to %s\n", level);
-  }  
-
-  if (logMode == ON) {
-    // get current timestamp for filename
-    time_t rawtime;
-    struct tm * timeinfo;
-    char buffer [80];
-    time ( &rawtime );
-    timeinfo = localtime ( &rawtime );
-    strftime (buffer,80,"output/output-%Y%m%d_%X.txt",timeinfo);
-    puts (buffer);
-  
-    outFilename = buffer;
-    outFile.open(outFilename);
-    logToFile("Program Trail Start:\n\n");
-  }
-}
-
-void logToFile(const char* text) {
-  if (isLogging()) {
-      outFile << text << endl;
-  }
-}  
-
-void endLogging() {
-  if( outFile.is_open() ) {
-    outFile << "\nEnd Program Trail\n";
-    outFile.close();
   }
 }
 
@@ -448,9 +385,8 @@ extern "C" void invokeScheduler(int id, int lineNum) {
     stringstream ss;
     ss << "[" << id << "] [" << lineNum << "] - ";
     ss << "No ready threads available to schedule; possible DEADLOCK detected.  Exiting.\n";
-    const char* deadlockMsg = ss.str().c_str();
-    writeMessage(deadlockMsg);
-    if (logMode == ON) {
+    log(ss.str());
+    if (getLogMode() == ON) {
       endLogging();
     }
     exit(EXIT_FAILURE);
@@ -469,27 +405,17 @@ extern "C" void invokeScheduler(int id, int lineNum) {
     readyThreadsHead = deleteThreadNode(numReadyThreads, readyThreadsHead, nextReadyThreadIndex);
     numReadyThreads--;
 
-    //printf("[%d] [%d]: sched - invokeScheduler: after setting nextThread to RUNNING; numReadyThreads=%d, readyThreads=%s\n", id, lineNum, numReadyThreads, printThreads(numReadyThreads, readyThreadsHead).c_str());
-
     if( currThreadId == nextThreadId) {
       // just continue; current thread will run again
       stringstream ss;
       ss << "[" << id << "] " << "[" << lineNum << "] - Selected next thread to run= " << nextThreadId << ", which is the same as current thread.\n";
-      writeMessage(ss.str().c_str());
-      if(tracing) {
-        printf("%s\n", ss.str().c_str());
-      }
+      log(ss.str());
     }
     else {
-      // just continue; current thread will run again
+      // wake up nextThread, and put currThread to sleep
       stringstream ss;
       ss <<  "[" << id << "] " << "[" << lineNum << "] - Switching from thread " << currThreadId << " to thread " << nextThreadId << ".\n";
-      writeMessage(ss.str().c_str());
-
-      // wake up nextThread, and put currThread to sleep
-      if (tracing) {
-        printf("%s\n", ss.str().c_str());
-      }
+      log(ss.str());
 
       // block SIGUSR1 signal
       if( pthread_sigmask( SIG_BLOCK, &sigSet, NULL) == -1) {
@@ -534,7 +460,7 @@ extern "C" void setThreadCompleted(int id) {
     invokeScheduler(id, -1);
   } else {
     logStatusToFile();
-    logToFile("Completed run successfully.");
+    log("Completed run successfully.");
   }
 }
 
@@ -550,7 +476,9 @@ extern "C" void mutexLock(int id, pthread_mutex_t &lock) {
   Lock* myLock = getLock(lock);
   char* lockName;
   if(myLock == NULL) {
-    printf("[%d] : sched - mutexLock: Unable to find lock\n", id);
+    stringstream ss;
+    ss << "[ " << id << "] : sched - mutexLock: ERROR:  Unable to find lock.  Verify lock was added to scheduler.  Exiting program now.\n";
+    log(ss.str());
     exit(EXIT_FAILURE);
   } 
   else {
@@ -564,10 +492,7 @@ extern "C" void mutexLock(int id, pthread_mutex_t &lock) {
     if(!myLock->isLocked) {
       stringstream ss;
       ss <<  "[" << id << "] " << "[" << -1 << "] - mutexLock:  lock is free; thread " << id << " will now hold lock " << lockName << endl;
-      logToFile(ss.str().c_str());
-      if (tracing) {
-        printf("[%d] : sched - mutexLock:  lock is free; thread %d will now hold lock  %s\n", id, id, lockName);
-      }
+      log(ss.str());
       myLock->isLocked = true;
       myLock->threadHolding = id;
     }  
@@ -575,11 +500,7 @@ extern "C" void mutexLock(int id, pthread_mutex_t &lock) {
       stringstream ss;
       ss <<  "[" << id << "] " << "[" << -1 << "] - mutexLock:  lock " << lockName << " is taken and held by thread " << myLock->threadHolding;
       ss << "; thread " << id << " will be added to the thread waiting list\n";
-      logToFile(ss.str().c_str());
-      if (tracing) {
-        printf("[%d] : sched - mutexLock:  lock %s is taken and held by thread %d\n", id, lockName, myLock->threadHolding);
-        printf("[%d] : sched - mutexLock:  thread %d will be added to thread waiting list\n", id, id);
-      }
+      log(ss.str());
 
       ThreadNode* newWaitList = addThreadNode(myLock->waitingCount, myLock->waitingHead, id);
       myLock->waitingHead = NULL;
@@ -609,7 +530,9 @@ extern "C" void mutexUnlock(int id, pthread_mutex_t &ptLock) {
   Lock* lock = getLock(ptLock);
   char* lockName;
   if(lock == NULL) {
-    printf("[%d] : sched - mutexUnlock: Error - Unable to find lock\n", id);
+    stringstream ss;
+    ss << "[" << id << "]  : sched - mutexUnlock: ERROR - Unable to find lock.  Verify lock was added to scheduler.  Exiting program now.\n";
+    log(ss.str());
     exit(EXIT_FAILURE);
   } 
   else {
@@ -625,10 +548,7 @@ extern "C" void mutexUnlock(int id, pthread_mutex_t &ptLock) {
       // log
       stringstream ss;
       ss <<  "[" << id << "] " << "[" << -1 << "] - mutexUnlock:  No threads waiting for lock " << lockName << endl;
-      logToFile(ss.str().c_str());
-      if (tracing) {     
-        printf("[%d] : sched - mutexUnlock:  No threads waiting for lock %s\n", id, lockName);
-      }
+      log(ss.str());
     }
     else { // transfer lock
       // select next thread
@@ -639,10 +559,8 @@ extern "C" void mutexUnlock(int id, pthread_mutex_t &ptLock) {
       // log
       stringstream ss;
       ss <<  "[" << id << "] " << "[" << -1 << "] - mutexUnlock:  Transferring lock " << lockName << " from thread " << id << " to thread " <<  nxtThreadId << "\n";  
-      logToFile(ss.str().c_str());
-      if (tracing) {
-        printf("%s\n", ss.str().c_str());
-      }
+      log(ss.str());
+  
       threadArray[nxtThreadId].status = READY;
       threadArray[nxtThreadId].waitingName = "";
       lock->threadHolding = nxtThreadId;
@@ -667,7 +585,9 @@ extern "C" void semWait(int id, sem_t &sem) {
   Semaphore* mySem = getSemaphore(sem);
   char* semName;
   if(mySem == NULL) {
-    printf("[%d] : sched - semWait: Unable to find semaphore\n", id);
+    stringstream ss;
+    ss << "[" << id << "] : sched - semWait: ERROR:  Unable to find semaphore.  Verify semaphore was added to scheduler.  Exiting program now.\n";
+    log(ss.str());
     exit(EXIT_FAILURE);
   }
   else {
@@ -687,12 +607,7 @@ extern "C" void semWait(int id, sem_t &sem) {
       stringstream ss;
       ss <<  "[" << id << "] " << "[" << -1 << "] - semWait:  sem " << semName << " is taken and has value=" << value;
       ss << "; thread " << id << " will be added to thread waiting list.\n";
-      logToFile(ss.str().c_str());
-
-      if (tracing) {
-        printf("[%d] : sched - semWait:  sem %s is taken and has value=%d\n", id, semName, value);
-        printf("[%d] : sched - semWait:  thread %d will be added to thread waiting list\n", id, id);
-      }
+      log(ss.str());
 
       ThreadNode* newWaitList = addThreadNode(waitingCount, mySem->waitingHead, id);
       mySem->waitingHead = NULL;
@@ -710,11 +625,7 @@ extern "C" void semWait(int id, sem_t &sem) {
       // log
       stringstream ss;
       ss <<  "[" << id << "] " << "[" << -1 << "] - semWait:  semaphore " << semName << " is available for thread " << id << "'s use.\n";
-      logToFile(ss.str().c_str());
-
-      if (tracing) {
-        printf("[%d] : sched - semWait:  semaphore %s is available; initial=%d, value=%d\n", id, semName, value);
-      }
+      log(ss.str());
     }
   }
 }
@@ -731,7 +642,9 @@ extern "C" void semPost(int id, sem_t &ptSem) {
   Semaphore* sem = getSemaphore(ptSem);
   char* semName;
   if(sem == NULL) {
-    printf("[%d] : sched - semPost: Error - Unable to find sem\n", id);
+    stringstream ss;
+    ss << "[" << id << "] : sched - semPost: ERROR - Unable to find semaphore.  Verify semaphore was added to scheduler.  Exiting program now.\n";
+    log(ss.str());
     exit(EXIT_FAILURE);
   }
   else {
@@ -749,11 +662,7 @@ extern "C" void semPost(int id, sem_t &ptSem) {
     if(waitingCount == 0) {
       stringstream ss;
       ss <<  "[" << id << "] " << "[" << -1 << "] - semPost:  No threads waiting for sem " << semName << "\n";
-      logToFile(ss.str().c_str());
-
-      if (tracing) {     
-       printf("[%d] : sched - semPost:  No threads waiting for sem %s\n", id, semName);
-      }
+      log(ss.str());
     }
     else { // "wake-up" thread waiting for sem
       int nextSemHolderIndex = getReadyThreadIndex(schedMode, 0, waitingCount); // TDOD:  handle error 
@@ -762,10 +671,7 @@ extern "C" void semPost(int id, sem_t &ptSem) {
 
       stringstream ss;
       ss << "[" << id << "] " << "[" << -1 << "] - semPost:  Granting semaphore " << semName << " to thread " <<  nxtThreadId << "\n";
-      logToFile(ss.str().c_str());
-      if (tracing) {
-        printf("%s\n", ss.str().c_str());
-      }
+      log(ss.str());
 
       threadArray[nxtThreadId].status = READY; // switch from WAITING_SEM to READY
       threadArray[nxtThreadId].waitingName = "";
@@ -782,18 +688,6 @@ extern "C" void semPost(int id, sem_t &ptSem) {
 /******************************************************************************************************
  *			ACCESSOR METHODS
  *****************************************************************************************************/
-
-void writeMessage(const char* msg) {
-  // write to console
-  if (schedMode != RANDOM) {
-    printf("%s\n", msg);
-  }
-
-  // write to output file
-  if (logMode == ON) {
-    logToFile(msg);
-  } 
-}
 
 /*
  * Prints thread, lock, and semaphore status.
@@ -818,15 +712,13 @@ extern "C" void printStatus() {
  * Outputs status to file in logMode == ON.
  */
 void logStatusToFile() {
-  if (logMode == ON) {
-    logToFile("**********************************************************************************\n");
-    logToFile(getThreadStatus().c_str());
-    logToFile("__________________________________________________________________________________\n");
-    logToFile(getLockStatus().c_str());
-    logToFile("__________________________________________________________________________________\n");
-    logToFile(getSemaphoreStatus().c_str());
-    logToFile("**********************************************************************************\n");
-  }
+  logToFile("**********************************************************************************\n");
+  logToFile(getThreadStatus().c_str());
+  logToFile("__________________________________________________________________________________\n");
+  logToFile(getLockStatus().c_str());
+  logToFile("__________________________________________________________________________________\n");
+  logToFile(getSemaphoreStatus().c_str());
+  logToFile("**********************************************************************************\n");
 }
 
 /*
@@ -909,8 +801,14 @@ string getSemaphoreStatus() {
  *                      HELPER FUNCTIONS
  *****************************************************************************************************/
 
-bool isLogging() {
-  return ((logMode == ON) && (outFile.is_open()));
+void log(string message) {
+  const char* msg = message.c_str();
+  // log to console if tracing or if not in RANDOM mode
+  if (tracing || (schedMode != RANDOM)) {
+    printf("%s\n", msg);
+  }
+  // log to file
+  logToFile(msg);
 }
 
 /*
@@ -969,14 +867,6 @@ int getReadyThreadIndex(SchedulerMode mode, int min, int max) {
   return index;
 }
 
-/*
- * Converts bool to string.
- */
-string boolToStr(const bool b) {
-    ostringstream ss;
-    ss << boolalpha << b;
-    return ss.str();
-}
 
 /*
  * Returns a comma deliminated list of thread ids.
@@ -1022,7 +912,7 @@ Lock* getLock(pthread_mutex_t &ptLock) {
     }
   }
   // get lock
-  Lock* lock;
+  Lock* lock = NULL;
   if(lockIndx != -1)
     lock = &(lockArray[lockIndx]);
   return lock;
@@ -1040,25 +930,9 @@ Semaphore* getSemaphore(sem_t &ptSem) {
     }
   }
   // get sem
-  Semaphore* sem;
+  Semaphore* sem = NULL;
   if(semIndx != -1)
     sem = &(semArray[semIndx]);
   return sem;
 }
 
-// Returns integer to string
-string intToStr(int num) {
-  stringstream numAsAlpha;
-  numAsAlpha << num;
-  return numAsAlpha.str();
-}
-
-void stoupper(std::string& s) {
-  std::string::iterator i = s.begin();
-  std::string::iterator end = s.end();
-
-  while (i != end) {
-    *i = std::toupper((unsigned char)*i);
-    ++i;
-  }
-}
